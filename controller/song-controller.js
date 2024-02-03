@@ -61,7 +61,7 @@ export const getSong = async (request, response) => {
 
         const genreCounts = await Song.aggregate(aggregation);
 
-        // Extended aggregation to count songs and albums for each artist
+      
         const artistAggregation = [
             {
                 $group: {
@@ -74,7 +74,7 @@ export const getSong = async (request, response) => {
 
         const artistCounts = await Song.aggregate(artistAggregation);
 
-        // Extended aggregation to count songs in each album
+      
         const albumAggregation = [
             {
                 $group: {
@@ -86,7 +86,7 @@ export const getSong = async (request, response) => {
 
         const albumCounts = await Song.aggregate(albumAggregation);
 
-        // 4. Combine song data, total counts, genre counts, artist counts, and album counts into a single response object
+      
         const responseData = {
             songs,
             totalSongs,
@@ -144,29 +144,50 @@ export const getSongById = async (request, response) => {
     }
 }
 
-// Save data of edited user in the database
+// Save data of edited song in the database
 export const editSong = async (request, response) => {
-    let song = await Song.findById(request.params.id);
-    song = request.body;
+    try {
+        const songId = request.params.id;
+        const updatedSongData = request.body;
 
-    const editSong = new Song(song);
-    try{
-        await Song.updateOne({_id: request.params.id}, editSong);
-        response.status(201).json(editSong);
-    } catch (error){
-        response.status(409).json({ message: error.message});     
+        // Find the existing song by ID
+        const existingSong = await Song.findById(songId);
+
+        if (!existingSong) {
+            return response.status(404).json({ message: "Song not found" });
+        }
+
+        // Update the fields of the existing song
+        existingSong.title = updatedSongData.title;
+        existingSong.artist = updatedSongData.artist;
+        existingSong.album = updatedSongData.album;
+        existingSong.genre = updatedSongData.genre;
+
+        // Save the updated song
+        await existingSong.save();
+
+        response.status(201).json(existingSong);
+    } catch (error) {
+        response.status(409).json({ message: error.message });
     }
-}
+};
 
-// deleting data of user from the database
+
+// deleting data of song from the database
 export const deleteSong = async (request, response) => {
-    try{
-        await Song.deleteSong({_id: request.params.id});
-        response.status(201).json("Song deleted Successfully");
-    } catch (error){
-        response.status(409).json({ message: error.message});     
+    try {
+        const result = await Song.deleteOne({ _id: request.params.id });
+
+        if (result.deletedCount === 1) {
+            response.status(201).json("Song deleted successfully");
+        } else {
+            response.status(404).json({ message: "Song not found" });
+        }
+    } catch (error) {
+        response.status(500).json({ message: error.message });
     }
-}
+};
+
 
 
 
