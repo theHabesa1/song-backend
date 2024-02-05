@@ -1,38 +1,6 @@
 import Song from "../model/song.js";
 
-// Get all users
-// export const getSong = async (request, response) => {
-//     // 1. Find all songs
-//     const songs = await Song.find();
-  
-//     // 2. Calculate the total number of songs
-//     const totalSongs = songs.length;
-  
-//     // 3. Use aggregation pipeline to efficiently calculate artist, album, and genre counts
-//     const aggregation = [
-//       {
-//         $group: {
-//           _id: null,
-//           totalArtists: { $addToSet: "$artist" }, // Count unique artists
-//           totalAlbums: { $addToSet: "$album" }, // Count unique albums
-//           totalGenres: { $addToSet: "$genre" }, // Count unique genres
-//         },
-//       },
-//     ];
-  
-//     const [result] = await Song.aggregate(aggregation);
-  
-//     // 4. Combine song data and counts into a single response object
-//     const responseData = {
-//       songs,
-//       totalSongs,
-//       totalArtists: result.totalArtists.length,
-//       totalAlbums: result.totalAlbums.length,
-//       totalGenres: result.totalGenres.length,
-//     };
-  
-//     response.status(200).json(responseData);
-//   };
+
 
 export const getSong = async (request, response) => {
     try {
